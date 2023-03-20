@@ -48,7 +48,7 @@ export function HomePage() {
     {
       id: '3',
       completed: false,
-      editing: false,
+      editing: true,
       content: '이젠 새로운거',
     },
   ]);
