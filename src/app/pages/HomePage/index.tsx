@@ -27,11 +27,31 @@ const Title = styled.h1`
 
 const TodoList = styled.div``;
 
-const TodoCheck = styled.input`
-  margin-right: 15px;
-`;
+// const TodoCheck = styled.input`
+//   margin-right: 15px;
+// `;
 
 export function HomePage() {
+  const [todoList, setTodoList] = React.useState<ITodoItem[]>([
+    {
+      id: '1',
+      completed: false,
+      editing: false,
+      content: '세미콜론 대체 경로가 어디냐',
+    },
+    {
+      id: '2',
+      completed: true,
+      editing: false,
+      content: '찾았다 ㅋㅋ',
+    },
+    {
+      id: '3',
+      completed: false,
+      editing: false,
+      content: '이젠 새로운거',
+    },
+  ]);
   return (
     <>
       <Helmet>
@@ -41,16 +61,13 @@ export function HomePage() {
       <Wrapper>
         <Box>
           <Title>할 일</Title>
-          <TodoInput />
+          <TodoInput
+            setTodoList={(todo: ITodoItem) => setTodoList([todo, ...todoList])}
+          />
           <TodoList>
-            <TodoItem
-              todo={{
-                id: '1',
-                completed: false,
-                editing: false,
-                content: '세미콜론 대체 경로가 어디냐',
-              }}
-            ></TodoItem>
+            {todoList.map(todo => (
+              <TodoItem todo={todo} />
+            ))}
           </TodoList>
         </Box>
       </Wrapper>
