@@ -1,9 +1,10 @@
 import { createSlice, nanoid, PayloadAction } from '@reduxjs/toolkit';
 import { useInjectReducer } from 'redux-injectors';
+import { loadTodoData, saveTodoData } from 'store/localStorage';
 import { TodoState } from './types';
 
 export const initialState: TodoState = {
-  todolist: [],
+  todolist: loadTodoData(),
 };
 
 const slice = createSlice({
@@ -13,6 +14,7 @@ const slice = createSlice({
     addTodo: {
       reducer: (state, action: PayloadAction<ITodoItem>) => {
         state.todolist.push(action.payload);
+        saveTodoData(state.todolist);
       },
       prepare: (content: string) => {
         const id = nanoid();
@@ -25,32 +27,42 @@ const slice = createSlice({
           },
         };
       },
-      editModeTodo(state, action: PayloadAction<{ id: string }>) {
-        const id = action.payload.id;
+    },
+    checkTodo(state, action: PayloadAction<{ id: string }>) {
+      const id = action.payload.id;
+      const todo = state.todolist.find(todo => todo.id === id);
+      if (todo) {
+        todo.completed = !todo.completed;
+      }
+      saveTodoData(state.todolist);
+    },
+    editModeTodo(state, action: PayloadAction<{ id: string }>) {
+      const id = action.payload.id;
 
-        for (const todo of state.todolist) {
-          if (state.id === id) continue;
-          if (todo.editing === true) todo.editing = false;
-        }
-        const todo = state.todolist.find(todo => todo.id === id);
-        if (todo) {
-          todo.editing = !todo.editing; // 체크해제
-        }
-      },
-      editTodo(state, action: PayloadAction<{ id: string; content: string }>) {
-        const id = action.payload.id;
-        const content = action.payload.content;
+      for (const todo of state.todolist) {
+        if (todo.id === id) continue;
+        if (todo.editing === true) todo.editing = false;
+      }
+      const todo = state.todolist.find(todo => todo.id === id);
+      if (todo) {
+        todo.editing = !todo.editing; // 체크해제
+      }
+    },
+    editTodo(state, action: PayloadAction<{ id: string; content: string }>) {
+      const id = action.payload.id;
+      const content = action.payload.content;
 
-        const todo = state.todolist.find(todo => todo.id === id);
-        if (todo) {
-          todo.content = content;
-        }
-      },
-      deleteTodo(state, action: PayloadAction<{ id: string }>) {
-        const id = action.payload.id;
-        const filteredTodos = state.todolist.filter(todo => todo.id !== id);
-        state.todolist = filteredTodos;
-      },
+      const todo = state.todolist.find(todo => todo.id === id);
+      if (todo) {
+        todo.content = content;
+      }
+      saveTodoData(state.todolist);
+    },
+    deleteTodo(state, action: PayloadAction<{ id: string }>) {
+      const id = action.payload.id;
+      const filteredTodos = state.todolist.filter(todo => todo.id !== id);
+      state.todolist = filteredTodos;
+      saveTodoData(state.todolist);
     },
   },
 });
